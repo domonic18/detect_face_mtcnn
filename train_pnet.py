@@ -1,6 +1,6 @@
-from data import model_mtcnn as nets
+from train import model_mtcnn as nets
 import os
-import utils.train as train
+import train.train as train
 
 
 

@@ -1,7 +1,8 @@
 import torch
 import os
 from torch.utils.data import DataLoader
-from data.FaceDataset import FaceDataset
+from train.FaceDataset import FaceDataset
+# from FaceDataset import FaceDataset
 import matplotlib.pyplot as plt
 
 
