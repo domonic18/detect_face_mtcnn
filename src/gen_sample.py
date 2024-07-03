@@ -315,11 +315,11 @@ def generate_samples(face_size, max_samples=-1):
 
 def main():
     # 生成12×12的样本
-    generate_samples(12, 100)
+    generate_samples(12, 1000)
 
-    generate_samples(24, 100)
+    generate_samples(24, 1000)
 
-    generate_samples(48, 100)
+    generate_samples(48, 1000)
 
 if __name__ == "__main__":
     main()
