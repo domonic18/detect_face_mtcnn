@@ -10,7 +10,7 @@ class FaceDataset(Dataset):
     def __init__(self, path):
         super().__init__()
         self.path = path
-        self.dataset = []
+        self.datasets = []
         self._read_annos()
 
     def _read_annos(self):
@@ -24,7 +24,7 @@ class FaceDataset(Dataset):
             self.datasets.extend(f.readlines())
 
     def __len__(self):
-        return len(self.dataset)
+        return len(self.datasets)
     
     def __getitem__(self, idx):
         strs = self.datasets[idx].strip().split()
