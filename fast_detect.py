@@ -1,6 +1,6 @@
 # import tool
-from utils.tool import nms
-from data import model_mtcnn as nets
+from utils.tool import nms as NMS
+from train import model_mtcnn as nets
 import torch
 import numpy as np
 from torchvision import transforms
