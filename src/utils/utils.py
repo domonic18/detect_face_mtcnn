@@ -1,5 +1,4 @@
 import numpy as np
-from tqdm import tqdm
 
 
 def IOU(box, boxes, isMin=False):
