@@ -13,11 +13,12 @@ from utils import IOU
 """
 datasets/
     |-celeba/
-        |-img_align_celeba/
+        |-img_celeba/
             |-000001.jpg
             |-000002.jpg
             ...
         |-list_bbox_celeba.txt
+        |-list_landmarks_celeba.txt
     |-train/
 """
 current_path = os.path.dirname(os.path.abspath(__file__))
