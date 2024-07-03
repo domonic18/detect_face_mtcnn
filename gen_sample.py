@@ -7,8 +7,7 @@ import random
 import numpy as np
 import torch
 from PIL import Image
-from utils import IOU
-
+from utils.tool import iou as IOU
 
 # 文件路径配置
 """
@@ -23,7 +22,7 @@ datasets/
     |-train/
 """
 current_path = os.path.dirname(os.path.abspath(__file__))
-BASE_PATH = os.path.join(current_path, "../datasets")
+BASE_PATH = os.path.join(current_path, "datasets")
 TARGET_PATH = os.path.join(BASE_PATH, "celeba")
 IMG_PATH = os.path.join(BASE_PATH, "celeba/img_celeba")
 DST_PATH = os.path.join(BASE_PATH, "train")
