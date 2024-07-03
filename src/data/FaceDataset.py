@@ -2,8 +2,8 @@
 # 数据集使用CelebA数据集的图片和标签
 import torch
 import os
+import numpy as np
 from torch.utils.data import DataLoader, Dataset 
-from torchvision.transforms import ToTensor
 from PIL import Image
 
 class FaceDataset(Dataset):
@@ -11,29 +11,43 @@ class FaceDataset(Dataset):
         super().__init__()
         self.path = path
         self.dataset = []
-        self.trans = ToTensor()
-        self.dataset.extend(open(os.path.join(self.path, "positive.txt")))
-        self.dataset.extend(open(os.path.join(self.path, "negative.txt")))
-        self.dataset.extend(open(os.path.join(self.path, "part.txt")))
-    
+        self._read_annos()
+
+    def _read_annos(self):
+        with open(os.path.join(self.path, "positive.txt")) as f:
+            self.datasets.extend(f.readlines())
+
+        with open(os.path.join(self.path, "negative.txt")) as f:
+            self.datasets.extend(f.readlines())
+
+        with open(os.path.join(self.path, "part.txt")) as f:
+            self.datasets.extend(f.readlines())
+
     def __len__(self):
         return len(self.dataset)
     
-    def __getitem__(self, index):
-        # 从数据集列表中获取指定索引的样本字符串
-        sample_str = self.dataset[index].strip().split(" ")
-        
-        # 解析样本信息
-        img_filename = sample_str[0]
-        cls = float(sample_str[1])
-        offset = list(map(float, sample_str[2:]))
-        
-        # 构建图像路径
-        img_path = os.path.join(self.path, img_filename)
-        
-        # 读取图像并应用变换
-        img = Image.open(img_path)
-        img = self.trans(img)
-        
-        # 返回图像、类别标签和偏移量
-        return img, torch.tensor([cls]), torch.tensor(offset)
+    def __getitem__(self, idx):
+        strs = self.datasets[idx].strip().split()
+        # 文件名字
+        img_name = strs[0]
+
+        # 取出类别
+        cls = torch.tensor([int(strs[1])], dtype=torch.float32)
+
+        # 将所有偏置转为float类型
+        strs[2:] = [float(x) for x in strs[2:]]
+
+        # bbox的偏置
+        offset = torch.tensor(strs[2:6], dtype=torch.float32)
+        # landmark的偏置
+        point = torch.tensor(strs[6:16], dtype=torch.float32)
+
+        # 打开图像
+        img = Image.open(os.path.join(self.path, img_name))
+
+        # 数据调整到 [-1, 1]之间
+        img_data = torch.tensor((np.array(img) / 255. - 0.5) / 0.5, dtype=torch.float32)
+        # [H, W, C] --> [C, H ,W]
+        img_data = img_data.permute(2, 0, 1)
+
+        return img_data, cls, offset, point
