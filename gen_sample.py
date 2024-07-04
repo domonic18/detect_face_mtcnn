@@ -29,9 +29,6 @@ DST_PATH = os.path.join(BASE_PATH, "train")
 LABEL_PATH = os.path.join(TARGET_PATH, "list_bbox_celeba.txt")
 LANMARKS_PATH = os.path.join(TARGET_PATH, "list_landmarks_celeba.txt")
 
-# 测试样本个数限制,设置为 -1 表示全部
-TEST_SAMPLE_LIMIT = 100
-
 # 为随机数种子做准备，使正样本，部分样本，负样本的比例为1：1：3
 float_num = [0.1, 0.1, 0.3, 0.5, 0.95, 0.95, 0.99, 0.99, 0.99, 0.99]
 
@@ -88,9 +85,11 @@ def generate_crop_boxes(cx, cy, max_side, img_w, img_h):
     
     返回:
     crop_boxes (list): 一个包含5个裁剪框坐标的列表,每个裁剪框的格式为 [x1, y1, x2, y2]
+    max_sides (list): 一个包含5个裁剪框最大边长的列表
     """
 
     crop_boxes = []
+    max_sides = []
     for _ in range(5):
         # 随机偏移中心点坐标以及边长
         seed = float_num[np.random.randint(0, len(float_num))]
@@ -114,12 +113,13 @@ def generate_crop_boxes(cx, cy, max_side, img_w, img_h):
         if _x1 < 0 or _y1 < 0 or _x2 > img_w or _y2 > img_h:
             continue
         
-        # 添加裁剪框坐标到列表中
+        # 添加裁剪框坐标和最大边长到列表中
         crop_boxes.append(np.array([_x1, _y1, _x2, _y2]))
+        max_sides.append(_max_side)
     
-    return crop_boxes
+    return crop_boxes, max_sides
 
-def process_crop_box(img, face_size, max_side, crop_box, boxes, landmarks):
+def process_crop_box(img, face_size, _max_side, crop_box, boxes, landmarks):
     """
     处理单个裁剪框,生成正负样本。
     
@@ -135,7 +135,6 @@ def process_crop_box(img, face_size, max_side, crop_box, boxes, landmarks):
     x1, y1, x2, y2 = boxes[0][:4]
     _x1, _y1, _x2, _y2 = crop_box[:4]
     px1, py1, px2, py2, px3, py3, px4, py4, px5, py5 = landmarks
-    _max_side = max_side
 
 
     offset_x1 = (x1 - _x1) / _max_side
@@ -201,6 +200,11 @@ def process_annotation(face_size, anno_line, landmarks):
 
     # 标签矫正
     x1, y1, x2, y2, w, h = adjust_bbox(x1, y1, w, h)
+    # 判断坐标是否符合要求
+    if max(w, h) < 40 or x1 < 0 or x2 < 0 or y1 < 0 or y2 < 0:
+        # 不符合要求的图片，返回[]不做处理
+        return []
+
     boxes = [[x1, y1, x2, y2]]
     
     # 计算人脸中心点坐标
@@ -217,9 +221,10 @@ def process_annotation(face_size, anno_line, landmarks):
         img_w, img_h = img.size
         # 生成候选的裁剪框
         samples = []
-        for crop_box in generate_crop_boxes(cx, cy, max_side, img_w, img_h):
+        crop_boxes, max_sides = generate_crop_boxes(cx, cy, max_side, img_w, img_h)
+        for crop_box, _max_side in zip(crop_boxes, max_sides):
             # 处理每个候选裁剪框,生成正负样本
-            sample = process_crop_box(img, face_size, max_side, crop_box, boxes, landmarks )
+            sample = process_crop_box(img, face_size, _max_side, crop_box, boxes, landmarks )
             if sample:
                 samples.append(sample)
     
