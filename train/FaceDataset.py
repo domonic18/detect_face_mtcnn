@@ -39,6 +39,7 @@ class FaceDataset(Dataset):
 
         # bbox的偏置
         offset = torch.tensor(strs[2:6], dtype=torch.float32)
+        
         # landmark的偏置
         point = torch.tensor(strs[6:16], dtype=torch.float32)
 

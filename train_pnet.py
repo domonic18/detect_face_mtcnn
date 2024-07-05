@@ -9,7 +9,7 @@ if __name__ == '__main__':
     current_path = os.path.dirname(os.path.abspath(__file__))
     # 权重存放地址
     base_path = os.path.join(current_path, "model")
-    model_path = os.path.join(base_path, "p_net.pt")
+    model_path = os.path.join(base_path, "p_net.pth")
 
     # 数据存放地址
     data_path = os.path.join(current_path, "datasets/train/12")
@@ -24,5 +24,4 @@ if __name__ == '__main__':
     # 开始训练
     t = train.Trainer(pnet, model_path, data_path)
 
-    # t.train2(0.01)
     t.train(100)

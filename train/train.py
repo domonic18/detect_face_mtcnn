@@ -133,7 +133,9 @@ class Trainer:
                 self.optimizer.step()
 
             # 保存模型（参数）
-            torch.save(self.net.state_dict(), self.param_path)
+            # torch.save(self.net.state_dict(), self.param_path)
+            # 保存整个模型
+            torch.save(self.net, self.param_path)
 
         # 绘制损失曲线
         self.plot_losses(cls_losses, offset_losses, point_losses, total_losses, landmark)

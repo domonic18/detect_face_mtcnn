@@ -1,14 +1,14 @@
-# import tool
-from utils.tool import nms as NMS
-from train import model_mtcnn as nets
+import os
+import cv2
+import time
 import torch
 import numpy as np
 from torchvision import transforms
-import time
 from PIL import Image, ImageDraw
-import cv2
-import os
 from torchvision.ops.boxes import batched_nms, nms
+from utils.tool import nms as NMS
+from train import model_mtcnn as nets
+import utils.tool as tool
 
 # 检测是否有GPU
 device = "cuda:0" if torch.cuda.is_available() else 'cpu'
@@ -40,9 +40,14 @@ class Detector(object):
         self.onet = nets.ONet().to(device)
 
         # 加载参数
-        self.pnet.load_state_dict(torch.load(pnet_path))
-        self.rnet.load_state_dict(torch.load(rnet_path))
-        self.onet.load_state_dict(torch.load(onet_path))
+        # self.pnet.load_state_dict(torch.load(pnet_path))
+        # self.rnet.load_state_dict(torch.load(rnet_path))
+        # self.onet.load_state_dict(torch.load(onet_path))
+
+        # 加载整个模型
+        self.pnet = torch.load(pnet_path).to(device)
+        self.rnet = torch.load(rnet_path).to(device)
+        self.onet = torch.load(onet_path).to(device)
 
         # 设为评估模式
         self.pnet.eval()
@@ -348,8 +353,8 @@ if __name__ == '__main__':
     img = Image.open(img_path)
     current_path = os.path.dirname(os.path.abspath(__file__))
     base_path = os.path.join(current_path, "model")
-    detector = Detector(os.path.join(base_path, "p_net.pt"), os.path.join(base_path, "r_net.pt"),
-                        os.path.join(base_path, "o_net.pt"))
+    detector = Detector(os.path.join(base_path, "p_net.pth"), os.path.join(base_path, "r_net.pth"),
+                        os.path.join(base_path, "o_net.pth"))
     # detector = Detector("model/p_net.pth", "model/r_net.pth", "model/o_net.pth")
     pnet_boxes, rnet_boxes, onet_boxes = detector.detect(img)
     img = cv2.imread(img_path)
