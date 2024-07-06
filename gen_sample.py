@@ -24,7 +24,7 @@ datasets/
 current_path = os.path.dirname(os.path.abspath(__file__))
 BASE_PATH = os.path.join(current_path, "datasets")
 TARGET_PATH = os.path.join(BASE_PATH, "celeba")
-IMG_PATH = os.path.join(BASE_PATH, "celeba/img_celeba")
+IMG_PATH = os.path.join(BASE_PATH, TARGET_PATH,"img_celeba")
 DST_PATH = os.path.join(BASE_PATH, "train")
 LABEL_PATH = os.path.join(TARGET_PATH, "list_bbox_celeba.txt")
 LANMARKS_PATH = os.path.join(TARGET_PATH, "list_landmarks_celeba.txt")
@@ -320,9 +320,9 @@ def generate_samples(face_size, max_samples=-1):
 def main():
     # 生成12×12的样本
     generate_samples(12, 1000)
-
+    # 生成24×24的样本
     generate_samples(24, 1000)
-
+    # 生成48×48的样本
     generate_samples(48, 1000)
 
 if __name__ == "__main__":
